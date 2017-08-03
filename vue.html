@@ -1,0 +1,175 @@
+<script src="vue.js"></script>
+
+<style>
+    .error {
+        border-left: 5px solid red;
+    }
+</style>
+
+<div id="app-7">
+     <label-input id="GroupName" v-model="GroupName" :required.bool="false"></label-input> 
+      <label-select id="BluePartner" :options="BluePartnerOptions" v-model="BluePartner"></label-select>  
+      <div>
+          <br>
+          <br>
+          Selected Group Name: {{ GroupName }}
+          <br/>
+          Selected Blue Partner: {{BluePartner}}
+      </div>
+</div>
+
+<script>
+
+function getFriendlyName(string){
+    string = string.replace(/([a-z])([A-Z])/g, '$1 $2');
+    string = string.replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
+    return string;
+}
+
+function getLabelWithColon(label, id){
+    if (!label){
+        label = getFriendlyName(id);
+    } 
+    return label + ':';
+}
+
+Vue.component('label-input', {
+    props: {
+        id: {
+            type: String,
+            required: true
+        },
+        label: {
+            type: String,
+            required: false,
+            default: ''
+        },
+        value: {
+            type: String,
+            required: false,
+            default: ''
+        },
+        required: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
+    },
+    methods: {
+        updateValue (value) {
+            this.isDirty = true;
+            this.$emit('input', String(value));
+        }
+    },
+    computed: {
+        labelWithColon() {
+            return getLabelWithColon(this.label, this.id);
+        },
+        shouldShowError() {
+            return this.required && (this.forceError || (this.isDirty && !this.value))
+        }
+    },
+    data() {
+        return {
+            isDirty: false,
+            forceError: false
+        }
+    },
+    template: `
+        <div>
+            <label :for="id">
+                {{ labelWithColon }}
+            </label>
+            <input type="text" :id="id" :class="{ error: shouldShowError, required: required }" :value="value" @input="updateValue($event.target.value)" />
+        </div>`
+});
+
+Vue.component('label-select', {
+    props: {
+        id: {
+            type: String,
+            required: true
+        },
+        label: {
+            type: String,
+            required: false
+        },
+        value: {
+            type: String,
+            required: false
+        },
+        options: {
+            type: Array,
+            required: true
+        }
+    },
+    methods: {
+        updateValue: function (value) {
+            this.isDirty = true;
+            this.$emit('input', value);
+        }
+    },
+    computed: {
+        labelWithColon: function () {
+            return getLabelWithColon(this.label, this.id);
+        },
+        shouldShowError() {
+            return this.forceError || (this.isDirty && !this.value)
+        }
+    },
+    data() {
+        return {
+            isDirty: false,
+            forceError: false
+        }
+    },
+    template: `
+        <div>
+            <label :for="id">
+                {{ labelWithColon }}
+            </label>
+            <select :id="id" :value="value" @input="updateValue($event.target.value)">
+                <option 
+                    v-for="option in options" 
+                    :value="option.value" >
+                    {{ option.text }}
+                </option>
+            </select>
+        </div>`
+})
+
+var vm = new Vue({
+    el: '#app-7',
+    data() {
+        return {
+           GroupName: 'Taylor Test Group',
+           BluePartner: '',
+           BluePartnerOptions: 
+            [
+                {
+                    value: '',
+                    text: ''
+                },
+                {
+                    value: 'AR',
+                    text: 'BCBS of AR'
+                },
+                {
+                    value: 'AK',
+                    text: 'BCBS of AK'
+                }
+            ]
+        }
+    },
+    computed: {
+        datatosubmit() {
+            let objecttoreturn = {}
+            for (var property in this._data){
+                
+            }
+            return this._data;
+        }
+    }
+})
+
+</script>
