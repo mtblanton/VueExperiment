@@ -15,14 +15,17 @@
 </style>
 
 <div id="app-7">
-     <label-input id="GroupName" v-model="GroupName" :required.bool="true"></label-input> 
+      <label-input id="GroupName" v-model="GroupName" :required.bool="true"></label-input> 
       <label-select id="BluePartner" :options="BluePartnerOptions" v-model="BluePartner" :required.bool="true"></label-select>  
+      <label-checkbox id="BenefitAddressSameAsOrganization" :v-model="BenefitAddressSameAsOrganization"></label-checkbox>
       <div>
           <br>
           <br>
           Selected Group Name: {{ GroupName }}
           <br/>
-          Selected Blue Partner: {{BluePartner}}
+          Selected Blue Partner: {{ BluePartner }}
+          <br>
+          Benefit Address Same as Organization: {{ BenefitAddressSameAsOrganization }}
       </div>
 </div>
 
@@ -157,6 +160,59 @@ Vue.component('label-select', {
                 </option>
             </select>
         </div>`
+});
+
+Vue.component('label-checkbox', {
+    props: {
+        id: {
+            type: String,
+            required: true
+        },
+        label: {
+            type: String,
+            required: false,
+            default: ''
+        },
+        value: {
+            type: Boolean,
+            required: false,
+            default: ''
+        },
+        required: {
+            type: Boolean,
+            required: false,
+            default: false
+        }
+    },
+    methods: {
+        updateValue: function (value) {
+            debugger;
+            this.isDirty = true;
+            this.$emit('input', Boolean(value));
+        }
+    },
+    computed: {
+        friendlyLabel() {
+            if (this.label) {
+                return this.label;
+            } else {
+                return getFriendlyName(this.id);
+            }
+        }
+    },
+    data() {
+        return {
+            isDirty: false,
+            forceError: false
+        }
+    },
+    template: `
+        <div>
+            <label :for="id">
+                {{ friendlyLabel }}
+            </label>
+            <input type="checkbox" :id="id" :checked.bool="value" @change="updateValue($event.target.checked)">
+        </div>`
 })
 
 var vm = new Vue({
@@ -179,16 +235,8 @@ var vm = new Vue({
                     value: 'AK',
                     text: 'BCBS of AK'
                 }
-            ]
-        }
-    },
-    computed: {
-        datatosubmit() {
-            let objecttoreturn = {}
-            for (var property in this._data){
-                
-            }
-            return this._data;
+            ],
+            BenefitAddressSameAsOrganization: Boolean(false)
         }
     }
 })
