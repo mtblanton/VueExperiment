@@ -1,14 +1,22 @@
 <script src="vue.js"></script>
 
 <style>
+    .required {
+        border-left: 5px solid blue;
+    }
+
+    .valid {
+        border-left: 5px solid white;
+    }
+
     .error {
         border-left: 5px solid red;
     }
 </style>
 
 <div id="app-7">
-     <label-input id="GroupName" v-model="GroupName" :required.bool="false"></label-input> 
-      <label-select id="BluePartner" :options="BluePartnerOptions" v-model="BluePartner"></label-select>  
+     <label-input id="GroupName" v-model="GroupName" :required.bool="true"></label-input> 
+      <label-select id="BluePartner" :options="BluePartnerOptions" v-model="BluePartner" :required.bool="true"></label-select>  
       <div>
           <br>
           <br>
@@ -67,6 +75,9 @@ Vue.component('label-input', {
         },
         shouldShowError() {
             return this.required && (this.forceError || (this.isDirty && !this.value))
+        },
+        isValid() {
+            return !this.forceError && this.value;
         }
     },
     data() {
@@ -80,7 +91,7 @@ Vue.component('label-input', {
             <label :for="id">
                 {{ labelWithColon }}
             </label>
-            <input type="text" :id="id" :class="{ error: shouldShowError, required: required }" :value="value" @input="updateValue($event.target.value)" />
+            <input type="text" :id="id" :class="{ error: shouldShowError, required: required, valid: isValid }" :value="value" @input="updateValue($event.target.value)" />
         </div>`
 });
 
@@ -92,15 +103,22 @@ Vue.component('label-select', {
         },
         label: {
             type: String,
-            required: false
+            required: false,
+            default: ''
         },
         value: {
             type: String,
-            required: false
+            required: false,
+            default: ''
         },
         options: {
             type: Array,
             required: true
+        },
+        required: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     methods: {
@@ -115,6 +133,9 @@ Vue.component('label-select', {
         },
         shouldShowError() {
             return this.forceError || (this.isDirty && !this.value)
+        },
+        isValid() {
+            return !this.forceError && this.value;
         }
     },
     data() {
@@ -128,7 +149,7 @@ Vue.component('label-select', {
             <label :for="id">
                 {{ labelWithColon }}
             </label>
-            <select :id="id" :value="value" @input="updateValue($event.target.value)">
+            <select :id="id" :value="value" @input="updateValue($event.target.value)" :class="{ error: shouldShowError, required: required, valid: isValid }">
                 <option 
                     v-for="option in options" 
                     :value="option.value" >
